@@ -1,0 +1,57 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% bootstrap_css %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Prioridades</title>
+</head>
+<body class="bg-dark text-light">
+    <div class="container mt-5">
+        <h1 class="display-6">Prioridades</h1>
+
+        <div class="card bg-secondary text-light mb-4">
+            <div class="card-body">
+                <form method="POST" action="{% url 'listaPrioridades' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="nomePrioridade">Nome da Nova Prioridade</label>
+                        <input type="text" class="form-control" id="nomePrioridade" name="descricao" 
+                            value="{{ form.instance.descricao|default:'' }}" placeholder="Digite o nome da Prioridade" required>
+                        <input type="hidden" name="id" value="{{ form.instance.id|default:'' }}">
+
+                    </div>
+                    <button type="submit" class="btn btn-dark mt-3">Salvar Prioridade</button>
+                    <a href="{% url 'listaTarefas' %}" style="text-decoration: none;">
+                        <button type="button" class="btn btn-dark mt-3">Voltar</button>
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        <div class="card bg-white text-dark">
+            <div class="card-body">
+                <ul id="prioridade-list" class="list-group">
+                    {% for prioridade in prioridades %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-light mb-2">
+                        {{ prioridade.descricao }}
+                        <div>
+                            <a href="?id={{ prioridade.id }}" class="btn btn-success btn-sm">Editar</a>
+                            <a href="{% url 'excluirPrioridade' prioridade.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center bg-dark text-light">
+                        Nenhuma prioridade cadastrada.
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% bootstrap_javascript %}
+</body>
+</html>

@@ -1,0 +1,115 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        {% bootstrap_css %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de Tarefas</title>
+    </head>
+
+    <body class="bg-dark text-light">
+        <div class="container mt-5">
+
+            <div class="text-center mb-4">
+                <h1 class="display-4">Lista de Tarefas</h1>
+                <p class="lead">Seu dia a dia organizado</p>
+            </div>
+
+            <div class="card bg-light shadow-sm mb-4">
+                <div class="card-header bg-light text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Tarefas</h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="POST" action="{% url 'listaTarefas' %}" class="form-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ tarefa.id|default:'' }}">
+
+                        <div class="row g-3 align-items-center mb-3 justify-content-center">
+                            <div class="col-auto">
+                                <input type="text" name="nome" class="form-control form-control-sm" 
+                                       placeholder="Nova Tarefa" required 
+                                       value="{{ tarefa.descricao|default:'' }}">
+                            </div>
+
+                            <div class="col-auto">
+                                <select name="categoria" class="form-select form-select-sm">
+                                    <option value="" disabled selected>Categoria</option>
+                                    {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}" 
+                                        {% if tarefa and tarefa.categoria.id == categoria.id %}selected{% endif %}>
+                                        {{ categoria.nome }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-auto">
+                                <select name="prioridade" class="form-select form-select-sm">
+                                    <option value="" disabled selected>Prioridade</option>
+                                    {% for prioridade in prioridades %}
+                                    <option value="{{ prioridade.id }}" 
+                                        {% if tarefa and tarefa.prioridade.id == prioridade.id %}selected{% endif %}>
+                                        {{ prioridade.descricao }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-sm btn-dark">Salvar Tarefa</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card bg-white text-dark mb-4">
+                <div class="card-body">
+                    <table class="table table-light table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Tarefa</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Prioridade</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tarefa in tarefas %}
+                            <tr>
+                                <td style="{% if tarefa.feito == 'S' %}text-decoration: line-through;{% endif %}">{{ tarefa.descricao }}</td>
+                                <td style="{% if tarefa.feito == 'S' %}text-decoration: line-through;{% endif %}">{{ tarefa.categoria.nome }}</td>
+                                <td style="{% if tarefa.feito == 'S' %}text-decoration: line-through;{% endif %}">{{ tarefa.prioridade.descricao }}</td>
+                                <td>
+                                    {% if tarefa.feito == 'S' %}
+                                        <a href="{% url 'marcarComoFeito' tarefa.id %}" class="btn btn-success btn-sm">Desfazer</a>
+                                    {% else %}
+                                        <a href="{% url 'marcarComoFeito' tarefa.id %}" class="btn btn-success btn-sm">Feito</a>
+                                    {% endif %}
+                                    <a href="?id={{ tarefa.id }}" class="btn btn-sm btn-secondary">Editar</a>
+                                    <a href="{% url 'excluirTarefa' tarefa.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">Nenhuma tarefa cadastrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Botões de edição de categorias e prioridade -->
+            <div class="text-center">
+                <a href="{% url 'listaCategorias' %}" class="btn btn-light mx-2">Editar Categorias</a>
+                <a href="{% url 'listaPrioridades' %}" class="btn btn-light mx-2">Criar Prioridade</a>
+            </div>
+        </div>
+
+        {% bootstrap_javascript %}
+    </body>
+</html>
